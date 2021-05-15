@@ -1,0 +1,59 @@
+---
+title: "Analise banco de dados Iris"
+author: "Willian"
+date: "May 15, 2021"
+output: html_document
+---
+
+#Ler e verificar estrutura do banco de dados
+Banco de dados padrão do R, não é necessário importar dados externos.
+
+```{r}
+str(iris)
+```
+
+#Visualização dos dados
+Verificar primeiras linhas do banco de dados
+```{r}
+subset(iris, Species == "setosa")[1:5,]
+subset(iris, Species == "versicolor")[1:5,]
+subset(iris, Species == "virginica")[1:5,]
+```
+#Analise exploratoria de dados
+##Estatistica basica
+```{r}
+summary(iris[iris$Species == "setosa",])
+summary(subset(iris, Species == "versicolor"))
+summary(iris[iris$Species == "virginica",])
+```
+
+##Distribuição dos dados
+```{r}
+hist(iris$Petal.Length,
+     main="Distribuição normal", xlab = "Comprimento" , ylab = "Freq. Absoluta")
+hist(iris$Petal.Width,
+     main="Distribuição normal", xlab = "Comprimento" , ylab = "Freq. Absoluta")
+```
+##Boxplot dos dados de comprimento das especies
+```{r}
+boxplot(iris$Petal.Length ~iris$Species,
+        main="Comprimento especies", xlab="Especies", ylab="Comprimento (cm)")
+```
+##Gráfico de dispersão dos dados de petala e sepala
+```{r}
+plot(iris$Petal.Length,iris$Sepal.Length)
+```
+##Analise bivariada dos dados
+```{r}
+pairs(iris[,1:4], col=iris$Species)
+```
+##Correlação entre os dados de comprimetos da Sepala e Petala
+```{r}
+cor(iris$Sepal.Length,iris$Petal.Length)
+```
+
+##Analise de decisão
+```{r}
+
+```
+
