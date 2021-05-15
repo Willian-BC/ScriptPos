@@ -52,3 +52,16 @@ dados[,6] <- dados[,6]/100
 dados[,9] <- dados[,9]/100
 dados[,16] <- dados[,16]/100
 
+#Separar texto milhões e bilhões
+dados <- dados %>% separate(`Patr Liq`, c("Patr Liq","XX"), sep=-2)
+dados$`Patr Liq` <- as.numeric(dados$`Patr Liq`)
+
+for(i in 1:length(dados$XX)){
+  if (dados$XX[i] == "mi"){
+    dados$`Patr Liq`[i] <- dados$`Patr Liq`[i]*1000000
+  }else if(dados$XX[i] == "bi"){
+    dados$`Patr Liq`[i] <- dados$`Patr Liq`[i]*1000000000
+  }
+}
+
+  
