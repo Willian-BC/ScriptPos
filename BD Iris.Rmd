@@ -54,6 +54,23 @@ cor(iris$Sepal.Length,iris$Petal.Length)
 
 ##Analise de decisão
 ```{r}
+library(C50)
 
+entrada <- iris[,1:4]
+classificacao <- iris[,5]
+
+modelo <- C5.0(entrada, classificacao, control = C5.0Control(noGlobalPruning = T, minCases = 1))
+modelo2 <- C5.0(entrada, classificacao, control = C5.0Control(noGlobalPruning = F))
+
+plot(modelo)
+plot(modelo2)
+```
+
+##Identificação nova planta
+```{r}
+nova.flor <- data.frame("Sepal.Length"= 1.5, "Sepal.Width"= 2.6, "Petal.Length"= 3, "Petal.Width"= 5)
+#nova.flor
+predicao <- predict(modelo, nova.flor, type= "class")
+predicao
 ```
 
