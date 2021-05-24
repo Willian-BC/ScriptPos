@@ -192,3 +192,137 @@ End If
 '    Next
     
 End Sub
+
+'Codigo Userfor1 (login e senha)
+
+Private Declare Function FindWindowA Lib "USER32" (ByVal lpClassName As String, ByVal lpWindowName As String) As Long
+Private Declare Function GetWindowLongA Lib "USER32" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
+Private Declare Function SetWindowLongA Lib "USER32" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+
+Private Sub cmdacessar_Click()
+
+Dim DATA As Date
+Dim USUARIO, SENHA As String
+
+USUARIO = Textusuario.Text
+SENHA = Textsenha.Text
+
+LISTAUSUARIO = USUARIO & " " & SENHA
+ThisWorkbook.Activate
+
+On Error Resume Next
+With Sheets("LISTA DE ACESSO")
+    Set PESQ = .Cells.Find(What:=LISTAUSUARIO, After:=.Cells(7), LookIn:=xlValues, LookAt:= _
+        xlWhole, SearchOrder:=xlByRows, SearchDirection:=xlNext, MatchCase:=False)
+End With
+
+nao = 0
+If USUARIO = "WCARDOSO" And SENHA = "1234" Then
+    Load Me
+    Sheets("LISTA DE ACESSO").Visible = xlSheetVisible     'EXIBINDO A ABA CONTROLE DE ACESSO
+    ThisWorkbook.Activate
+    Unload UserForm1
+    i = (Sheets("LISTA DE ACESSO").Cells(Rows.Count, 1).End(xlUp).Row) + 1
+    Sheets("LISTA DE ACESSO").Cells(i, 1) = Textusuario.Text
+    Sheets("LISTA DE ACESSO").Cells(i, 2) = NomeUsuario()
+    Sheets("LISTA DE ACESSO").Cells(i, 3) = TextBoxdata.Text
+    TextBoxdata = Format("dd/m/yyyy h:mm;@")
+    Application.Visible = True
+ElseIf PESQ Is Nothing Then
+    MsgBox "USUÁRIO OU SENHA INCORRETO", vbExclamation, "ATENÇÃO!"
+    Textusuario.Text = ""
+    Textsenha.Text = ""
+    nao = 1
+Else
+    Load Me
+    ThisWorkbook.Activate
+    Unload UserForm1
+    i = (Sheets("LISTA DE ACESSO").Cells(Rows.Count, 1).End(xlUp).Row) + 1
+    Sheets("LISTA DE ACESSO").Cells(i, 1) = Textusuario.Text
+    Sheets("LISTA DE ACESSO").Cells(i, 2) = NomeUsuario()
+    Sheets("LISTA DE ACESSO").Cells(i, 3) = TextBoxdata.Text
+    TextBoxdata = Format("dd/m/yyyy h:mm;@")
+    Application.Visible = True
+End If
+
+If nao = 0 Then
+    i = ThisWorkbook.Sheets.Count
+    For a = 1 To i
+        If Sheets(a).Name = "START" Then
+            Sheets("BD TEMPLATE").Visible = xlSheetVisible
+            Sheets("ST TEMPLATE").Visible = xlSheetVisible
+            Sheets(a).Visible = xlSheetVeryHidden
+        ElseIf Sheets(a).Name <> "BD TEMPLATE" And Sheets(a).Name <> "ST TEMPLATE" And Sheets(a).Name <> "LISTA DE ACESSO" Then
+            Sheets(a).Visible = xlHidden
+        End If
+    Next
+End If
+nao = 0
+'ThisWorkbook.Save  salvar quem acessou a planilha
+'UserForm2.Show
+End Sub
+Private Sub cmdcancelar_Click()
+Unload Me
+Application.Visible = True
+ThisWorkbook.Close SaveChanges:=False
+End Sub
+Private Sub Textusuario_Exit(ByVal Cancel As MSForms.ReturnBoolean)
+    Textusuario.Text = UCase(Textusuario.Text)
+End Sub
+Private Sub UserForm_Initialize()
+'    i = ThisWorkbook.Sheets.Count
+'    SheetSheets("LISTA DE ACESSO").Visible = xlSheetVeryHidden
+'    For a = 2 To i - 2
+'        Sheets(a).Visible = xlHidden
+'    Next
+    TextBoxdata = Now()
+    Dim hwnd As Long
+    hwnd = FindWindowA(vbNullString, Me.Caption)
+    SetWindowLongA hwnd, -16, GetWindowLongA(hwnd, -16) And &HFFF7FFFF
+End Sub
+Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)
+    Dim hwnd As Long
+    hwnd = FindWindowA(vbNullString, Me.Caption)
+    SetWindowLongA hwnd, -16, GetWindowLongA(hwnd, -16) Or &H80000
+End Sub
+
+'Codigo Userfor2 (pesquisa)
+
+Private Declare Function FindWindowA Lib "USER32" (ByVal lpClassName As String, ByVal lpWindowName As String) As Long
+Private Declare Function GetWindowLongA Lib "USER32" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
+Private Declare Function SetWindowLongA Lib "USER32" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+
+Private Sub CommandButton1_Click()
+    Dim ABA As String
+    
+    If IsNull(ListBox1.Object) Then
+        MsgBox "SELECIONE UM ÍTEM", vbCritical, "ATENÇÃO!"
+    Else
+    ABA = ListBox1.Object
+    Sheets(ABA).Visible = xlSheetVisible
+    Sheets(ABA).Select
+    Unload Me
+    End If
+End Sub
+
+Private Sub CommandButton2_Click()
+    Unload Me
+End Sub
+
+Private Sub TextBox1_Change()
+    sValues = Application.Transpose(Sheets("LISTA DE ACESSO").Range("J3:J" & Sheets("LISTA DE ACESSO").Range("J1").End(xlDown).Row).Value)
+    ListBox1.List = Filter(sValues, TextBox1.Text, True, vbTextCompare)
+End Sub
+
+Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)
+    Dim hwnd As Long
+    hwnd = FindWindowA(vbNullString, Me.Caption)
+    SetWindowLongA hwnd, -16, GetWindowLongA(hwnd, -16) Or &H80000
+End Sub
+
+Private Sub UserForm_Initialize()
+    Dim sValues() As Variant
+    sValues = Application.Transpose(Sheets("LISTA DE ACESSO").Range("J3:J" & Sheets("LISTA DE ACESSO").Range("J3").End(xlDown).Row).Value)
+    ListBox1.List = sValues
+    
+End Sub
