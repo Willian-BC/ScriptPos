@@ -101,3 +101,4 @@ INICIO:
     ActiveSheet.ShowAllData
     Cells(3, 2).Select
     Application.ScreenUpdating = True
+End Sub
