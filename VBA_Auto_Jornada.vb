@@ -8,7 +8,7 @@ Sub Jornada()
     End If
     On Error Resume Next
     ActiveSheet.ShowAllData
-    Range("AK4", Cells(4, 37).End(xlDown)).ClearContents
+    Range("AJ4", Cells(4, 37).End(xlDown)).ClearContents
     tam = (Cells(4, 12).End(xlToRight).Column - Cells(4, 11).Column) / 2
     
     For k = 1 To 6
@@ -35,15 +35,17 @@ Sub Jornada()
     ActiveSheet.Range("E:E").AutoFilter Field:=5, Criteria1:="*VENDEDOR*", Operator:=xlOr, Criteria2:="*CLIENTES*"
     If Not IsEmpty(Cells(lin_inicio, 2).Value) Then
         lin_inicio = ActiveSheet.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
+        Cells(lin_inicio, 36).Value = "INATIVO"
         Cells(lin_inicio, 37).Value = "INATIVO"
-        Range("AK" & lin_inicio & ":AK" & Cells(lin_inicio, 2).End(xlDown).Row).SpecialCells(xlCellTypeVisible).FillDown
+        Range("AJ" & lin_inicio & ":AK" & Cells(lin_inicio, 2).End(xlDown).Row).SpecialCells(xlCellTypeVisible).FillDown
     End If
     ActiveSheet.ShowAllData
     ActiveSheet.Range("E:E").AutoFilter Field:=5, Criteria1:="INDISPONÍVEL", Operator:=xlOr, Criteria2:="INATIVORRR"
     If Not IsEmpty(Cells(lin_inicio, 2).Value) Then
         lin_inicio = ActiveSheet.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
+        Cells(lin_inicio, 36).Value = "INATIVO"
         Cells(lin_inicio, 37).Value = "INATIVO"
-        Range("AK" & lin_inicio & ":AK" & Cells(lin_inicio, 2).End(xlDown).Row).SpecialCells(xlCellTypeVisible).FillDown
+        Range("AJ" & lin_inicio & ":AK" & Cells(lin_inicio, 2).End(xlDown).Row).SpecialCells(xlCellTypeVisible).FillDown
     End If
     ActiveSheet.ShowAllData
     
@@ -82,6 +84,7 @@ INICIO:
             j = j + 2
         Next
         If tam < 3 Then
+            Cells(lin, 36).Value = "AGUARDANDO DADOS"
             Cells(lin, 37).Value = "AGUARDANDO DADOS"
         ElseIf ref1 = ref2 And b > 0 And c = 0 Then
             Cells(lin, 37).Value = "ATENÇÃO"
@@ -106,6 +109,17 @@ INICIO:
         End If
     Next rngcell
     ActiveSheet.ShowAllData
+    
+    ActiveSheet.Range("AJ:AJ").AutoFilter Field:=36, Criteria1:="="
+    lin_inicio = ActiveSheet.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
+    atual = 38 - Cells(4, 12).End(xlToRight).Column
+    anterior = atual - 2
+    Cells(lin_inicio, 36).FormulaR1C1 = "=IF(RC[-" & atual & "]=RC[-" & anterior & "],""MANTÉM"",IF(RC[-" & atual & "]<RC[-" & anterior & "],""MELHOROU"",""PIOROU""))"
+    Range("AJ" & lin_inicio & ":AJ" & Cells(4, 2).End(xlDown).Row).SpecialCells(xlCellTypeVisible).FillDown
+    ActiveSheet.ShowAllData
+    Columns("AJ:AJ").Copy
+    Columns("AJ:AJ").PasteSpecial Paste:=xlPasteValues
+    
     Cells(3, 2).Select
     
     Application.ScreenUpdating = True
@@ -253,7 +267,7 @@ Sub Classificar()
     ActiveSheet.Range("F:F").AutoFilter Field:=6, Criteria1:="<>CONTATADO"
     lin_inicio = ActiveSheet.AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
     If Not IsEmpty(Cells(lin_inicio, 1).Value) Then
-        Cells(lin_inicio, 10).Value = "PERDIDO"
+        Cells(lin_inicio, 10).Value = "RISCO"
         Cells(lin_inicio, 11).Value = 1
         If Not IsEmpty(Cells(lin_inicio, 1).End(xlDown).Value) Then
             Range("J" & lin_inicio & ":K" & Cells(lin_inicio, 1).End(xlDown).Row).SpecialCells(xlCellTypeVisible).FillDown
@@ -385,6 +399,5 @@ Sub Classificar()
     Columns("J:K").PasteSpecial Paste:=xlPasteValues
     
     Application.ScreenUpdating = True
-    MsgBox "AJUSTAR QUANTIDADE DE COMPRA > 3 PARA CLIENTES COM STATUS 'PROSPECÇÃO'"
+    MsgBox "AJUSTAR QUANTIDADE DE COMPRA >= 3 PARA CLIENTES COM STATUS 'FIDELIZAÇÃO'"
 End Sub
-
