@@ -1,14 +1,15 @@
-Private Sub Workbook_Open()
+Private Sub UserForm_Initialize()
     Sheets("Base de dados").Visible = xlSheetVeryHidden
-    ThisWorkbook.RefreshAll
-    UserForm1.Show
+    Sheets("Baixa").Visible = xlSheetVeryHidden
+    Sheets("Excluido").Visible = xlSheetVeryHidden
 End Sub
-
 Private Sub CommandButton100_Click()
     Dim MyValue As Variant
     MyValue = InputBox("Digite a senha")
     If MyValue = "1010" Then
         Sheets("Base de dados").Visible = xlSheetVisible
+        Sheets("Baixa").Visible = xlSheetVisible
+        Sheets("Excluido").Visible = xlSheetVisible
     Else
         MsgBox ("Senha Incorreta")
     End If
@@ -20,34 +21,35 @@ End Sub
 Private Sub CommandButton1_Click()
 'OK PESQUISA'
     Application.ScreenUpdating = False
-    ThisWorkbook.RefreshAll
     Sheets("Base de dados").Visible = xlSheetVisible
     Sheets("Base de dados").Activate
     Set wb = ActiveWorkbook
     
-    Sheets("Base de dados").ListObjects("Base_de_dados").ShowAutoFilter = True
+    If Not Sheets("Base de dados").AutoFilterMode Then
+        Sheets("Base de dados").Range("A1").End(xlToRight).AutoFilter
+    End If
     On Error Resume Next
     Sheets("Base de dados").ShowAllData
     
     Set rngAF = Range("A1:A" & Cells(1, 1).End(xlDown).Row)
     
     If TextBox1 <> "" Then
-        Sheets("Base de dados").ListObjects("Base_de_dados").Range.AutoFilter Field:=2, Criteria1:="=*" & TextBox1.Text & "*"
+        Sheets("Base de dados").Range("B:B").AutoFilter Field:=2, Criteria1:=TextBox1.Text
     End If
     If TextBox2 <> "" Then
-        Sheets("Base de dados").ListObjects("Base_de_dados").Range.AutoFilter Field:=3, Criteria1:=TextBox2.Text
+        Sheets("Base de dados").Range("C:C").AutoFilter Field:=3, Criteria1:=TextBox2.Text
     End If
     If TextBox3 <> "" Then
-        Sheets("Base de dados").ListObjects("Base_de_dados").Range.AutoFilter Field:=4, Criteria1:=TextBox3.Text
+        Sheets("Base de dados").Range("D:D").AutoFilter Field:=4, Criteria1:=TextBox3.Text
     End If
     If TextBox4 <> "" Then
-        Sheets("Base de dados").ListObjects("Base_de_dados").Range.AutoFilter Field:=5, Criteria1:=TextBox4.Text
+        Sheets("Base de dados").Range("E:E").AutoFilter Field:=5, Criteria1:=TextBox4.Text
     End If
     If TextBox5 <> "" Then
-        Sheets("Base de dados").ListObjects("Base_de_dados").Range.AutoFilter Field:=6, Criteria1:="=*" & TextBox5.Text & "*"
+        Sheets("Base de dados").Range("F:F").AutoFilter Field:=6, Criteria1:="=*" & TextBox5.Text & "*"
     End If
     If TextBox6 <> "" Then
-        Sheets("Base de dados").ListObjects("Base_de_dados").Range.AutoFilter Field:=8, Criteria1:=TextBox6.Text
+        Sheets("Base de dados").Range("H:H").AutoFilter Field:=8, Criteria1:=TextBox6.Text
     End If
     
     lin_inicio = Sheets("Base de dados").AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
@@ -60,7 +62,7 @@ Private Sub CommandButton1_Click()
     Else
     
     Dim arrayItems2()
-        With Planilha2
+        With Planilha5
             ReDim arrayItems2(0 To WorksheetFunction.Subtotal(102, Sheets("Base de dados").Range("C:C")), 1 To 10) '.UsedRange.Columns.Count
             Me.ListBox1.ColumnCount = 10 '.UsedRange.Columns.Count
             Me.ListBox1.ColumnWidths = "30;130;80;90;80;90;90;80;80;200"
@@ -139,11 +141,13 @@ Private Sub CommandButton4_Click()
         GoTo FIM
     End If
     
-    Sheets("Base de dados").ListObjects("Base_de_dados").ShowAutoFilter = True
+    If Not Sheets("Base de dados").AutoFilterMode Then
+        Sheets("Base de dados").Range("A1").End(xlToRight).AutoFilter
+    End If
     On Error Resume Next
     Sheets("Base de dados").ShowAllData
     
-    Sheets("Base de dados").ListObjects("Base_de_dados").Range.AutoFilter Field:=1, Criteria1:=ID
+    Sheets("Base de dados").Range("A:A").AutoFilter Field:=1, Criteria1:=ID
     
     lin_inicio = Sheets("Base de dados").AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
     
@@ -168,12 +172,14 @@ End Sub
 
 Private Sub CommandButton5_Click()
 'APAGAR PESQUISA
-    Application.ScreenUpdating = False
-    Set wb = ActiveWorkbook
     If ListBox1.ListCount = 0 Then
         MsgBox "FAVOR PREENCHER ALGUM CAMPO DE PESQUISA PARA CONTINUAR !", vbCritical
         GoTo FIM
     End If
+    
+    Application.ScreenUpdating = False
+    Sheets("Base de dados").Visible = xlSheetVisible
+    Sheets("Base de dados").Activate
     
     result = MsgBox("TEM CERTEZA QUE DESEJA EXCLUIR UM REGISTRO?", vbYesNo + vbCritical)
     If result = vbYes Then
@@ -183,16 +189,18 @@ Private Sub CommandButton5_Click()
         End If
         result = MsgBox("TEM CERTEZA QUE DESEJA EXCLUIR O ID " & ID & "?" & vbCrLf & vbCrLf & "ESSA AÇÃO NÃO É POSSÍVEL SER REVERTIDA", vbYesNo + vbCritical)
         If result = vbYes Then
-            'endereço do arquivo
-            Set wb_bd = Workbooks.Open("H:\Grupos\COL - Metodos e Processos\4-MELHORIA CONTÍNUA\3-ESTUDOS E PROJETOS\3-GERAL\2021_10_04_Controle de estoque\Pasta\ARQ.MP.001 - BD.xlsx")
             If Not Sheets("Base de dados").AutoFilterMode Then
                 Sheets("Base de dados").Range("A1").End(xlToRight).AutoFilter
             End If
             On Error Resume Next
             Sheets("Base de dados").ShowAllData
+            
             Sheets("Base de dados").Range("A:A").AutoFilter Field:=1, Criteria1:=ID
+            
             lin_inicio = Sheets("Base de dados").AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
             
+            Sheets("Base de dados").Rows(lin_inicio).Copy Sheets("Excluido").Rows(Sheets("Excluido").Cells(1, 1).End(xlDown).Row + 1)
+            Sheets("Excluido").Cells(Sheets("Excluido").Cells(1, 1).End(xlDown).Row, 13) = Date
             Rows(lin_inicio).Delete
             
             Sheets("Base de dados").ShowAllData
@@ -201,48 +209,45 @@ Private Sub CommandButton5_Click()
             Sheets("Base de dados").Cells(3, 1) = 2
             Sheets("Base de dados").Range("A2:A3").AutoFill Destination:=Range("A2:A" & Cells(1, 2).End(xlDown).Row)
             
-            wb_bd.Close SaveChanges:=True
-            wb.Activate
-            ListBox1.Clear
-            wb.RefreshAll
             MsgBox "CADASTRO EXCLUIDO COM SUCESSO!", vbInformation
+            ListBox1.Clear
         End If
     End If
 FIM:
+    Sheets("Base de dados").Visible = xlSheetVeryHidden
     Application.ScreenUpdating = True
 End Sub
 
 Private Sub CommandButton101_Click()
 'OK CADASTRO'
-    Application.ScreenUpdating = False
-    Set wb = ActiveWorkbook
-    
     If TextBox109 <> "" Then
         MsgBox "CADASTRO JÁ EXISTE!" & vbCrLf & vbCrLf & "CLIQUE EM ATUALIZAR REGISTRO OU LIMPAR", vbCritical
         GoTo FIM
     ElseIf TextBox101 = "" Or TextBox102 = "" Or TextBox103 = "" Or TextBox104 = "" Or TextBox105 = "" Or TextBox106 = "" Or TextBox107 = "" Or TextBox108 = "" Then
         MsgBox "FAVOR PREENCHER TODOS OS CAMPOS PARA CADASTRO!", vbCritical
         GoTo FIM
-    Else
-        Set wb_bd = Workbooks.Open("H:\Grupos\COL - Metodos e Processos\4-MELHORIA CONTÍNUA\3-ESTUDOS E PROJETOS\3-GERAL\2021_10_04_Controle de estoque\Pasta\ARQ.MP.001 - BD.xlsx")
-        On Error Resume Next
-        Sheets("Base de dados").ShowAllData
-        lin = Sheets("Base de dados").Cells(1, 1).End(xlDown).Row + 1
-        Sheets("Base de dados").Cells(lin, 1) = Sheets("Base de dados").Cells(lin - 1, 1) + 1
-        Sheets("Base de dados").Cells(lin, 2) = TextBox101.Text
-        Sheets("Base de dados").Cells(lin, 3) = TextBox102.Text
-        Sheets("Base de dados").Cells(lin, 4) = TextBox103.Text
-        Sheets("Base de dados").Cells(lin, 5) = TextBox104.Text
-        Sheets("Base de dados").Cells(lin, 6) = TextBox105.Text
-        Sheets("Base de dados").Cells(lin, 7) = TextBox106.Text
-        Sheets("Base de dados").Cells(lin, 8) = TextBox107.Text
-        Sheets("Base de dados").Cells(lin, 9) = TextBox108.Text
-        Sheets("Base de dados").Cells(lin, 10) = TextBox110.Text
-        Sheets("Base de dados").Cells(lin, 11) = Date
     End If
-    wb_bd.Close SaveChanges:=True
-    wb.Activate
-    wb.RefreshAll
+    Application.ScreenUpdating = False
+    Sheets("Base de dados").Visible = xlSheetVisible
+    
+    Sheets("Base de dados").Activate
+    On Error Resume Next
+    Sheets("Base de dados").ShowAllData
+    lin = Sheets("Base de dados").Cells(1, 1).End(xlDown).Row + 1
+    Sheets("Base de dados").Cells(lin, 1) = Sheets("Base de dados").Cells(lin - 1, 1) + 1
+    Sheets("Base de dados").Cells(lin, 2) = TextBox101.Text
+    Sheets("Base de dados").Cells(lin, 3) = TextBox102.Text
+    Sheets("Base de dados").Cells(lin, 4) = TextBox103.Text
+    Sheets("Base de dados").Cells(lin, 5) = TextBox104.Text
+    Sheets("Base de dados").Cells(lin, 6) = TextBox105.Text
+    Sheets("Base de dados").Cells(lin, 7) = TextBox106.Text
+    Sheets("Base de dados").Cells(lin, 8) = TextBox107.Text
+    Sheets("Base de dados").Cells(lin, 9) = TextBox108.Text
+    Sheets("Base de dados").Cells(lin, 10) = TextBox110.Text
+    Sheets("Base de dados").Cells(lin, 11) = Date
+    
+    Sheets("Base de dados").Visible = xlSheetVeryHidden
+    
     result = MsgBox("CADASTRO REALIZADO COM SUCESSO!" & vbCrLf & vbCrLf & "DESEJA LIMPAR OS DADOS?", vbYesNo + vbInformation)
     If result = vbYes Then
         TextBox101 = ""
@@ -256,8 +261,11 @@ Private Sub CommandButton101_Click()
         TextBox109 = ""
         TextBox110 = ""
     End If
-FIM:
+    
+    TextBox101.SetFocus
+    
     Application.ScreenUpdating = True
+FIM:
 End Sub
 
 Private Sub CommandButton102_Click()
@@ -285,19 +293,19 @@ End Sub
 
 Private Sub CommandButton104_Click()
 'ATUALIZAR CADASTRO
-    Application.ScreenUpdating = False
-    
     If TextBox109 = "" Then
         MsgBox "CADASTRO NÃO EXISTE!" & vbCrLf & vbCrLf & "CLIQUE EM CADASTRAR", vbCritical
         GoTo FIM
     End If
-    Set wb_bd = Workbooks.Open("H:\Grupos\COL - Metodos e Processos\4-MELHORIA CONTÍNUA\3-ESTUDOS E PROJETOS\3-GERAL\2021_10_04_Controle de estoque\Pasta\ARQ.MP.001 - BD.xlsx")
+    Application.ScreenUpdating = False
+    Sheets("Base de dados").Visible = xlSheetVisible
+    
+    Sheets("Base de dados").Activate
     If Not Sheets("Base de dados").AutoFilterMode Then
         Sheets("Base de dados").Range("A1").End(xlToRight).AutoFilter
     End If
     On Error Resume Next
     Sheets("Base de dados").ShowAllData
-    
     Sheets("Base de dados").Range("A:A").AutoFilter Field:=1, Criteria1:=TextBox109.Text
     
     lin_inicio = Sheets("Base de dados").AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
@@ -311,12 +319,11 @@ Private Sub CommandButton104_Click()
     Sheets("Base de dados").Cells(lin_inicio, 8) = TextBox107.Text
     Sheets("Base de dados").Cells(lin_inicio, 9) = TextBox108.Text
     Sheets("Base de dados").Cells(lin_inicio, 10) = TextBox110.Text
+    Sheets("Base de dados").Cells(lin_inicio, 12) = Date
     
     Sheets("Base de dados").ShowAllData
+    Sheets("Base de dados").Visible = xlSheetVeryHidden
     
-    wb_bd.Close SaveChanges:=True
-    wb.Activate
-    wb.RefreshAll
     result = MsgBox("CADASTRO ATUALIZADO COM SUCESSO!" & vbCrLf & vbCrLf & "DESEJA LIMPAR OS DADOS?", vbYesNo + vbInformation)
     If result = vbYes Then
         TextBox101 = ""
@@ -331,20 +338,20 @@ Private Sub CommandButton104_Click()
         TextBox110 = ""
         UserForm1.MultiPage1.Value = 0
     End If
-FIM:
     Application.ScreenUpdating = True
+FIM:
 End Sub
 
 Private Sub CommandButton201_Click()
 'OK BAIXA
-    Application.ScreenUpdating = False
-    Sheets("Base de dados").Visible = xlSheetVisible
-    Sheets("Base de dados").Activate
-    
+
     If TextBox201 = "" Or TextBox202 = "" Or (OptionButton1.Value = False And OptionButton2.Value = False) Then
         MsgBox "FAVOR PREENCHER TODOS OS CAMPOS!", vbCritical
         GoTo FIM
     End If
+    Application.ScreenUpdating = False
+    Sheets("Base de dados").Visible = xlSheetVisible
+    Sheets("Base de dados").Activate
 NOVO:
     If Not Sheets("Base de dados").AutoFilterMode Then
         Sheets("Base de dados").Range("A1").End(xlToRight).AutoFilter
@@ -353,7 +360,7 @@ NOVO:
     Sheets("Base de dados").ShowAllData
     
     Set rngAF = Range("A1:A" & Cells(1, 1).End(xlDown).Row)
-        
+    
     If TextBox201 <> "" Then
         Sheets("Base de dados").Range("C:C").AutoFilter Field:=3, Criteria1:=TextBox201.Text
     End If
@@ -368,44 +375,45 @@ NOVO:
         GoTo FIM
     Else
         Dim arrayItems2()
-        With Planilha5
-            ReDim arrayItems2(0 To WorksheetFunction.Subtotal(102, Sheets("Base de dados").Range("C:C")), 1 To .UsedRange.Columns.Count)
-            Me.ListBox2.ColumnCount = .UsedRange.Columns.Count
-            'Me.ListBox1.ColumnWidths = "30;100;80;80;50;80;50;50"
-            Me.ListBox2.ColumnWidths = "30;130"
-            i = 0
-            For Each rngcell In rngAF.SpecialCells(xlCellTypeVisible)
-                Me.ListBox2.AddItem
-                For coluna = 1 To .UsedRange.Columns.Count
-                    arrayItems2(i, coluna) = .Cells(rngcell.Row, coluna).Value
-                Next coluna
-                i = i + 1
-            Next rngcell
-            Me.ListBox2.List = arrayItems2()
-        End With
-    End If
+            With Planilha5
+                ReDim arrayItems2(0 To WorksheetFunction.Subtotal(102, Sheets("Base de dados").Range("C:C")), 1 To 10) '.UsedRange.Columns.Count
+                Me.ListBox2.ColumnCount = 10 '.UsedRange.Columns.Count
+                Me.ListBox2.ColumnWidths = "30;130;80;90;80;90;90;80;80;200"
+                i = 0
+                For Each rngcell In rngAF.SpecialCells(xlCellTypeVisible)
+                    Me.ListBox2.AddItem
+                    For coluna = 1 To 10 '.UsedRange.Columns.Count
+                        arrayItems2(i, coluna) = .Cells(rngcell.Row, coluna).Value
+                    Next coluna
+                    i = i + 1
+                Next rngcell
+                Me.ListBox2.List = arrayItems2()
+            End With
+        End If
 
     If OptionButton1.Value = True Then
-        If Not Sheets("Base de dados").AutoFilterMode Then
-            Sheets("Base de dados").Range("A1").End(xlToRight).AutoFilter
-        End If
-        On Error Resume Next
-        Sheets("Base de dados").ShowAllData
-        
-        If TextBox201 <> "" Then
-            Sheets("Base de dados").Range("C:C").AutoFilter Field:=3, Criteria1:=TextBox201.Text
-        End If
-        If TextBox202 <> "" Then
-            Sheets("Base de dados").Range("F:F").AutoFilter Field:=6, Criteria1:="=*" & TextBox202.Text & "*"
-        End If
-        
-        lin_inicio = Sheets("Base de dados").AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
-'       lin_fim = Sheets("Base de dados").Cells(1, 1).SpecialCells(xlCellTypeVisible).End(xlDown).Row
+'        If Not Sheets("Base de dados").AutoFilterMode Then
+'            Sheets("Base de dados").Range("A1").End(xlToRight).AutoFilter
+'        End If
+'        On Error Resume Next
+'        Sheets("Base de dados").ShowAllData
+'
+'        If TextBox201 <> "" Then
+'            Sheets("Base de dados").Range("C:C").AutoFilter Field:=3, Criteria1:=TextBox201.Text
+'        End If
+'        If TextBox202 <> "" Then
+'            Sheets("Base de dados").Range("F:F").AutoFilter Field:=6, Criteria1:="=*" & TextBox202.Text & "*"
+'        End If
+'
+'        lin_inicio = Sheets("Base de dados").AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
+'        lin_fim = Sheets("Base de dados").Cells(1, 1).SpecialCells(xlCellTypeVisible).End(xlDown).Row
         
         result = MsgBox("TEM CERTEZA QUE DESEJA DAR BAIXA EM TODO O PEDIDO " & TextBox201 & "?" & vbCrLf & vbCrLf & "ESSA AÇÃO NÃO É POSSÍVEL SER REVERTIDA", vbYesNo + vbCritical)
         If result = vbYes Then
             Do While Cells(lin_inicio, 1).Value <> 0
-                Rows(lin_inicio).Delete
+                Sheets("Base de dados").Rows(lin_inicio).Copy Sheets("Baixa").Rows(Sheets("Baixa").Cells(1, 1).End(xlDown).Row + 1)
+                Sheets("Baixa").Cells(Sheets("Baixa").Cells(1, 1).End(xlDown).Row, 13) = Date
+                Sheets("Base de dados").Rows(lin_inicio).Delete
                 lin_inicio = Sheets("Base de dados").AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
             Loop
             Sheets("Base de dados").ShowAllData
@@ -416,16 +424,13 @@ NOVO:
         Else
             GoTo FIM
         End If
-        Sheets("Base de dados").ShowAllData
+'        Sheets("Base de dados").ShowAllData
         MsgBox "BAIXA REALIZADA COM SUCESSO !", vbInformation
-        'result = MsgBox("BAIXA REALIZADA COM SUCESSO!" & vbCrLf & vbCrLf & "DESEJA LIMPAR OS DADOS?", vbYesNo + vbInformation)
-        'If result = vbYes Then
-            TextBox201 = ""
-            TextBox202 = ""
-            OptionButton1.Value = False
-            OptionButton2.Value = False
-            ListBox2.Clear
-        'End If
+        TextBox201 = ""
+        TextBox202 = ""
+        OptionButton1.Value = False
+        OptionButton2.Value = False
+        ListBox2.Clear
         GoTo FIM
     ElseIf OptionButton2.Value = True Then
         ID = Application.InputBox("INFORME O ID")
@@ -445,7 +450,9 @@ NOVO:
             Sheets("Base de dados").Range("A:A").AutoFilter Field:=1, Criteria1:=ID
             lin_inicio = Sheets("Base de dados").AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
             
-            Rows(lin_inicio).Delete
+            Sheets("Base de dados").Rows(lin_inicio).Copy Sheets("Baixa").Rows(Sheets("Baixa").Cells(1, 1).End(xlDown).Row + 1)
+            Sheets("Baixa").Cells(Sheets("Baixa").Cells(1, 1).End(xlDown).Row, 13) = Date
+            Sheets("Base de dados").Rows(lin_inicio).Delete
             
             Sheets("Base de dados").ShowAllData
             result = MsgBox("BAIXA REALIZADA COM SUCESSO!" & vbCrLf & vbCrLf & "DESEJA BAIXAR OUTRO ITEM DESSE PEDIDO ?", vbYesNo + vbInformation)
@@ -562,6 +569,3 @@ End Sub
 'KeyAscii = Asc(UCase(Chr(KeyAscii)))
 '
 'End Sub
-Private Sub UserForm_Click()
-
-End Sub
