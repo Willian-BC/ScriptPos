@@ -8,7 +8,7 @@ Dim confirma_peso As Integer
     ActiveSheet.DisplayPageBreaks = False
     Application.Calculation = xlManual
     
-    tempo = Now()
+    StartTime = Timer
     
     ws = ThisWorkbook.ActiveSheet.Name
     
@@ -52,6 +52,14 @@ Dim confirma_peso As Integer
     w = 6
     aux = 1
     
+    'Limpa filtro aba programação
+    Worksheets("Programação").Activate
+    Worksheets("Programação").Range("A1").Select
+    Worksheets("Programação").ListObjects(1).ShowAutoFilter = True
+    Worksheets("Programação").ListObjects(1).AutoFilter.ShowAllData
+    
+    Worksheets(ws).Activate
+    
     For k = 6 To num_linhas
 inicio:
         If Worksheets(ws).Cells(k, 11).Value > 0 And Worksheets(ws).Cells(k, 23).Value = "" Then
@@ -88,10 +96,10 @@ continua:
                         peso_unitário = (Worksheets(ws).Cells(k, 9).Value / Worksheets(ws).Cells(k, 10).Value)
                         
                         Worksheets("Programação").Activate
-                        If Cells(2, 1) = "" Then
+                        If Worksheets("Programação").Cells(2, 1) = "" Then
                             y = 2
                         Else
-                            y = Cells(1, 1).End(xlDown).Row + 1
+                            y = Worksheets("Programação").Cells(1, 1).End(xlDown).Row + 1
                         End If
                         
                         'Copia ordem de produção
@@ -99,6 +107,7 @@ continua:
                         Worksheets("Programação").Cells(y, 2).Value = Worksheets(ws).Cells(w, 32).Value
                         Worksheets(ws).Range("A" & k & ":J" & k).Copy Worksheets("Programação").Cells(y, 3)
                         Worksheets("Programação").Cells(y, 13) = peso
+
                         Worksheets("Programação").Cells(y, 14) = peso / peso_unitário
                         Worksheets("Programação").Cells(y, 15) = (Worksheets("Programação").Cells(y, 13) / Worksheets("Programação").Cells(y, 11))
                         Worksheets("Programação").Cells(y, 16) = "Sem MP"
@@ -113,10 +122,10 @@ continua:
                         peso_unitário = (Worksheets(ws).Cells(k, 9).Value / Worksheets(ws).Cells(k, 10).Value)
                         
                         Worksheets("Programação").Activate
-                        If Cells(2, 1) = "" Then
+                        If Worksheets("Programação").Cells(2, 1) = "" Then
                             y = 2
                         Else
-                            y = Cells(1, 1).End(xlDown).Row + 1
+                            y = Worksheets("Programação").Cells(1, 1).End(xlDown).Row + 1
                         End If
                         
                         'Copia ordem de produção
@@ -135,6 +144,9 @@ continua:
                 Else
                     Worksheets(ws).Range("AA5").Select
                     Worksheets(ws).ListObjects(2).Range.AutoFilter Field:=4, Criteria1:=">0"
+                    If Worksheets(ws).Cells(k, 22) <> 0 And Worksheets(ws).Cells(k, 22) <> "" Then
+                        Worksheets(ws).ListObjects(2).Range.AutoFilter Field:=6, Criteria1:=">" & Format(Worksheets(ws).Cells(k, 22), "mm/dd/yyyy")
+                    End If
                     lin_inicio = Worksheets(ws).AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
                     Worksheets(ws).ListObjects(2).AutoFilter.ShowAllData
                     If Cells(lin_inicio, 30).Value = 0 Then
@@ -168,7 +180,94 @@ fim:
     Application.DisplayStatusBar = True
     Application.EnableEvents = True
     ActiveSheet.DisplayPageBreaks = True
-    execucao = Format((Now() - tempo) * 24 * 3600, "#0")
-    respostafinal = MsgBox("Concluído em: " & execucao & "s", vbInformation) = vbOK
+    MsgBox "Concluído em: " & Format((Timer - StartTime) / 86400, "hh:mm:ss")
+    'execucao = Format((Now() - tempo) * 24 * 3600, "#0")
+    'respostafinal = MsgBox("Concluído em: " & execucao & "s", vbInformation) = vbOK
     
+End Sub
+
+Sub Capacidade()
+    confirma_execucao = MsgBox("Confirmar reset da capacidade?", vbQuestion + vbYesNo)
+     If confirma_execucao = vbNo Then
+        Exit Sub
+    End If
+    
+    Application.ScreenUpdating = False
+    Application.DisplayStatusBar = False
+    Application.EnableEvents = False
+    ActiveSheet.DisplayPageBreaks = False
+    Application.Calculation = xlManual
+    
+    ws = ActiveSheet.Name
+    Worksheets(ws).Range("AA5").Select
+    Worksheets(ws).ListObjects(2).ShowAutoFilter = True
+    Worksheets(ws).ListObjects(2).AutoFilter.ShowAllData
+    Worksheets(ws).Columns(30).ClearContents
+    Worksheets(ws).Cells(5, 30) = "capacidade (kg)"
+    Worksheets(ws).Cells(6, 30).FormulaR1C1 = "=RC[-3]*RC[-2]*RC[-1]"
+    Worksheets(ws).Range("AD6:AD" & Cells(5, 32).End(xlDown).Row).FillDown
+    Worksheets(ws).Calculate
+    Worksheets(ws).Columns("AD:AD").Copy
+    Worksheets(ws).Columns("AD:AD").PasteSpecial Paste:=xlPasteValues
+    Worksheets(ws).Columns(33).ClearContents
+    Worksheets(ws).Cells(5, 33) = "programdado (kg)"
+    
+    Application.ScreenUpdating = True
+    Application.DisplayStatusBar = True
+    Application.EnableEvents = True
+    ActiveSheet.DisplayPageBreaks = True
+End Sub
+
+Sub calcular()
+    Application.ScreenUpdating = False
+    Application.DisplayStatusBar = False
+    Application.EnableEvents = False
+    ActiveSheet.DisplayPageBreaks = False
+    Application.Calculation = xlManual
+    
+    ws = ActiveSheet.Name
+    Worksheets(ws).Calculate
+    
+    Application.ScreenUpdating = True
+    Application.DisplayStatusBar = True
+    Application.EnableEvents = True
+    ActiveSheet.DisplayPageBreaks = True
+End Sub
+
+Sub limpar()
+    confirma_execucao = MsgBox("Confirma limpeza da etapa programada?", vbQuestion + vbYesNo)
+     If confirma_execucao = vbNo Then
+        Exit Sub
+    End If
+    Application.ScreenUpdating = False
+    Application.DisplayStatusBar = False
+    Application.EnableEvents = False
+    ActiveSheet.DisplayPageBreaks = False
+    Application.Calculation = xlManual
+    
+    ws = ActiveSheet.Name
+    Worksheets("Programação").Activate
+    Worksheets("Programação").Range("A1").Select
+    Worksheets("Programação").ListObjects(1).ShowAutoFilter = True
+    Worksheets("Programação").ListObjects(1).AutoFilter.ShowAllData
+    
+    Worksheets("Programação").ListObjects(1).Range.AutoFilter Field:=1, Criteria1:=ws
+    lin_inicio = Worksheets("Programação").AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
+    lin_fim = Worksheets("Programação").Cells(1, 1).SpecialCells(xlCellTypeVisible).End(xlDown).Row
+    If Cells(lin_inicio, 1).Value = 0 Then
+        Worksheets("Programação").ListObjects(1).AutoFilter.ShowAllData
+        Worksheets(ws).Activate
+        verifica_capacidade = MsgBox("Etapa não programada", vbInformation) = vbOK
+        GoTo fim
+    End If
+    Rows(lin_inicio & ":" & lin_fim).SpecialCells(xlCellTypeVisible).Delete
+    Worksheets("Programação").ListObjects(1).AutoFilter.ShowAllData
+    
+    Worksheets(ws).Activate
+    Worksheets(ws).Calculate
+fim:
+    Application.ScreenUpdating = True
+    Application.DisplayStatusBar = True
+    Application.EnableEvents = True
+    ActiveSheet.DisplayPageBreaks = True
 End Sub
