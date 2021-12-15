@@ -176,6 +176,28 @@ continua:
 prox:
     Next
 fim:
+    
+    Worksheets("Programação").Activate
+    Worksheets("Programação").Range("A1").Select
+    Worksheets("Programação").ListObjects(1).ShowAutoFilter = True
+    Worksheets("Programação").ListObjects(1).AutoFilter.ShowAllData
+    
+    Worksheets("Programação").Cells(2, 17).Formula2R1C1 = "=ISOWEEKNUM(RC[-15])"
+    Worksheets("Programação").Cells(2, 18).Formula2R1C1 = "=PROPER(TEXT(RC[-16],""mmmm""))"
+    Worksheets("Programação").Cells(2, 19).Formula2R1C1 = "=VLOOKUP(RC[-12],COMPONENTES!C[-18]:C[11],30,0)"
+    Worksheets("Programação").Cells(2, 20).Formula2R1C1 = "=VLOOKUP(RC[-13],COMPONENTES!C[-19]:C[4],24,0)"
+    Worksheets("Programação").Cells(2, 21).Formula2R1C1 = "=IF(AND(RC[-2]=""Produto Acabado"",RIGHT(RC[-13],3)=""398""),""Galvanizado"",IF(AND(RC[-2]=""Produto Acabado"",RIGHT(RC[-13],3)<>""398""),""Pintado"",""""))"
+    Worksheets("Programação").Cells(2, 22).Formula2R1C1 = "=VLOOKUP(RC[-15],COMPONENTES!C[-21]:C[-20],2,0)"
+    Worksheets("Programação").Cells(2, 23).Formula2R1C1 = "=IF(OR(RC[-18]=0,RC[-18]=302),""Kanban"",XLOOKUP(RC[-18],'COMPONENTES (4PR)'!C[-16],'COMPONENTES (4PR)'!C[-7],"""",0,1))"
+    Worksheets("Programação").Cells(2, 24).Formula2R1C1 = "=RC[-16]&RC[-19]"
+    
+    Worksheets("Programação").Range("Q2:X" & Cells(2, 1).End(xlDown).Row).FillDown
+    Worksheets("Programação").Calculate
+    Worksheets("Programação").Range("Q2:X" & Cells(2, 1).End(xlDown).Row).Copy
+    Worksheets("Programação").Range("Q2:X" & Cells(2, 1).End(xlDown).Row).PasteSpecial Paste:=xlPasteValues
+    
+    Worksheets(ws).Activate
+    
     Application.ScreenUpdating = True
     Application.DisplayStatusBar = True
     Application.EnableEvents = True
