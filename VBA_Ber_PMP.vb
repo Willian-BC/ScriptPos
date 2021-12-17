@@ -474,3 +474,100 @@ kill:
     
 End Sub
 
+-------------------------------------------------------
+
+Sub limpar_capacidade()
+    confirma_execucao = MsgBox("Confirmar reset da capacidade?", vbQuestion + vbYesNo)
+    If confirma_execucao = vbNo Then Exit Sub
+    
+    Application.ScreenUpdating = False
+    Application.DisplayStatusBar = False
+    Application.EnableEvents = False
+    ActiveSheet.DisplayPageBreaks = False
+    Application.Calculation = xlManual
+    
+    ws = ActiveSheet.Name
+    Worksheets(ws).Range("AA5").Select
+    Worksheets(ws).ListObjects(2).ShowAutoFilter = True
+    Worksheets(ws).ListObjects(2).AutoFilter.ShowAllData
+    Worksheets(ws).Columns(30).ClearContents
+    Worksheets(ws).Cells(5, 30) = "capacidade (kg)"
+    Worksheets(ws).Cells(6, 30).FormulaR1C1 = "=RC[-3]*RC[-2]*RC[-1]"
+    Worksheets(ws).Range("AD6:AD" & Cells(5, 32).End(xlDown).Row).FillDown
+    Worksheets(ws).Calculate
+    Worksheets(ws).Columns("AD:AD").Copy
+    Worksheets(ws).Columns("AD:AD").PasteSpecial Paste:=xlPasteValues
+    Worksheets(ws).Columns(33).ClearContents
+    Worksheets(ws).Cells(5, 33) = "programdado (kg)"
+
+    Worksheets("Programação").Activate
+    Worksheets("Programação").Range("A1").Select
+    Worksheets("Programação").ListObjects(1).ShowAutoFilter = True
+    Worksheets("Programação").ListObjects(1).AutoFilter.ShowAllData
+    
+    Worksheets("Programação").ListObjects(1).Range.AutoFilter Field:=1, Criteria1:=ws
+    lin_inicio = Worksheets("Programação").AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row
+    lin_fim = Worksheets("Programação").Cells(1, 1).SpecialCells(xlCellTypeVisible).End(xlDown).Row
+    If Cells(lin_inicio, 1).Value = 0 Then
+        Worksheets("Programação").ListObjects(1).AutoFilter.ShowAllData
+        Worksheets(ws).Activate
+        verifica_capacidade = MsgBox("Etapa não programada", vbInformation) = vbOK
+        GoTo fim
+    End If
+    Rows(lin_inicio & ":" & lin_fim).SpecialCells(xlCellTypeVisible).Delete
+    Worksheets("Programação").ListObjects(1).AutoFilter.ShowAllData
+    
+    Worksheets(ws).Activate
+    Worksheets(ws).Calculate
+fim:
+    Application.ScreenUpdating = True
+    Application.DisplayStatusBar = True
+    Application.EnableEvents = True
+    ActiveSheet.DisplayPageBreaks = True
+End Sub
+
+Sub calcular()
+    Application.ScreenUpdating = False
+    Application.DisplayStatusBar = False
+    Application.EnableEvents = False
+    ActiveSheet.DisplayPageBreaks = False
+    Application.Calculation = xlManual
+    
+    ws = ActiveSheet.Name
+    Worksheets(ws).Calculate
+    
+    Application.ScreenUpdating = True
+    Application.DisplayStatusBar = True
+    Application.EnableEvents = True
+    ActiveSheet.DisplayPageBreaks = True
+End Sub
+
+Sub formula()
+    Application.ScreenUpdating = False
+    Application.DisplayStatusBar = False
+    Application.EnableEvents = False
+    ActiveSheet.DisplayPageBreaks = False
+    Application.Calculation = xlManual
+    
+    ws = ActiveSheet.Name
+    Worksheets(ws).Range("A5").Select
+    Worksheets(ws).ListObjects(1).ShowAutoFilter = True
+    Worksheets(ws).ListObjects(1).AutoFilter.ShowAllData
+    
+    Worksheets(ws).Cells(6, 17).Formula2R1C1 = "=XLOOKUP(RC[3],COMPONENTES!C[19],COMPONENTES!C[7],"""",0,1)"
+    Worksheets(ws).Cells(6, 18).Formula2R1C1 = "=XLOOKUP(RC[-15],'COMPONENTES (4PR)'!C[-11],'COMPONENTES (4PR)'!C[-3],"""",0,1)"
+    Worksheets(ws).Cells(6, 19).Formula2R1C1 = "=XLOOKUP(RC[-16],'COMPONENTES (4PR)'!C[-12],'COMPONENTES (4PR)'!C[-17],"""",0,1)"
+    Worksheets(ws).Cells(6, 20).Formula2R1C1 = "=XLOOKUP(RC[-15],COMPONENTES!C[-19],COMPONENTES!C[-16],"""",0,-1)"
+    Worksheets(ws).Cells(6, 21).Formula2R1C1 = "=XLOOKUP(RC[-16],COMPONENTES!C[-20],COMPONENTES!C[-16],"""",0,-1)"
+    Worksheets(ws).Cells(6, 22).Formula2R1C1 = "=IF(RC[-10]=""OK"",R6C32-1,XLOOKUP(RC[-2]&RC[-19],'Programação'!C[2],'Programação'!C[-20],"""",0,-1))"
+    
+    Worksheets(ws).Range("Q6:V" & Worksheets(ws).Cells(5, 6).End(xlDown).Row).FillDown
+    Worksheets(ws).Calculate
+    Worksheets(ws).Range("Q6:U" & Worksheets(ws).Cells(5, 6).End(xlDown).Row).Copy
+    Worksheets(ws).Range("Q6:U" & Worksheets(ws).Cells(5, 6).End(xlDown).Row).PasteSpecial Paste:=xlPasteValues
+    
+    Application.ScreenUpdating = True
+    Application.DisplayStatusBar = True
+    Application.EnableEvents = True
+    ActiveSheet.DisplayPageBreaks = True
+End Sub
