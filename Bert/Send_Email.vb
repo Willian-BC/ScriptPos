@@ -7,9 +7,9 @@ Sub ENVIAR()
     ThisWorkbook.Save
     
     With OutlookMail
-        .To = "qualidade@ber.com.br"
-        .Subject = "Ticket da qualidade"
-        .Body = "Prezados," & vbNewLine & "Segue ticket da qualidade para avaliação." & vbNewLine _
+                .To = "ticket@outlook.com.br"
+        .Subject = "Ticket"
+        .Body = "Prezados," & vbNewLine & "Segue ticket para avaliação." & vbNewLine _
             & vbNewLine & "Nome: " & Sheets("Planilha1").Range("B3").Value _
             & vbNewLine & "Setor: " & Sheets("Planilha1").Range("D3").Value _
             & vbNewLine & "Descrição: " & Sheets("Planilha1").Range("B5").Value _
