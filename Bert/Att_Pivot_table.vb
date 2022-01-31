@@ -1,4 +1,5 @@
 'DASHBOARD
+''''''''''''''''''ATUALIZA TABELA DINAMICA > CELL E2'''''''''''''''''''''''''''
 Private Sub Worksheet_Change(ByVal Target As Range)
 'Update by Extendoffice 20180702
     Application.Calculation = xlAutomatic
