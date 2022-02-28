@@ -1,3 +1,4 @@
+Public Sub CommandButton1_Click()
 Application.ScreenUpdating = False
     Set wb = ActiveWorkbook
     Set ws = Sheets("Base de dados")
