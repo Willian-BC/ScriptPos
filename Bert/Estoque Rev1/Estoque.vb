@@ -1,3 +1,4 @@
+'Microsoft ActiveX Data Objects 6.1 Library
 'Option Explicit
 Dim gConexao As New ADODB.Connection
 Dim lrs As New ADODB.Recordset
