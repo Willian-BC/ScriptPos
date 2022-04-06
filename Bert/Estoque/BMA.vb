@@ -31,6 +31,48 @@ Private Sub CommandButton200_Click()
     ThisWorkbook.Save
 End Sub
 
+Private Sub CommandButton300_Click()
+    Dim OutlookApp As Object
+    Dim OutlookMail As Object
+    Dim ch1, ch2 As Chart
+    
+    Set OutlookApp = CreateObject("Outlook.Application")
+    Set OutlookMail = OutlookApp.CreateItem(0)
+    Set ch1 = ThisWorkbook.Worksheets("Descrição").ChartObjects("Gráfico 1").Chart
+    Set ch2 = ThisWorkbook.Worksheets("Descrição").ChartObjects("Gráfico 2").Chart
+    
+    Const pic1 = "Chart1.png"
+    Const pic2 = "Chart2.png"
+    
+    ch1.Export ThisWorkbook.Path & "\Chart1.png"
+    ch2.Export ThisWorkbook.Path & "\Chart2.png"
+    
+    With OutlookMail
+                .To = "renan.barros@bertolini.com.br;fellipe.novaes@bertolini.com.br;pcp.colatina@bertolini.com.br;margarete.comachio@bertolini.com.br;margarete.comachio@bertolini.com.br;danyele.rodrigues@bertolini.com.br;willian.martins@bertolini.com.br;italo.moschem@bertolini.com.br"
+        .Subject = "Itens armazenados em estoque BMA"
+        .Body = "Prezados," & vbNewLine
+        .Attachments.Add ThisWorkbook.Path & "\" & pic1
+        .Attachments.Add ThisWorkbook.Path & "\" & pic2
+        .HTMLBody = "<html><p>Prezados,</p>" & _
+                    "<p>Segue comparativo entre quantidade em estoque x quantidade máxima suportada:</p>" & _
+                    "<img src=cid:" & Replace(pic1, " ", "%20") & " height=2*240 width=2*180>" & _
+                    "<img src=cid:" & Replace(pic2, " ", "%20") & " height=2*240 width=2*180>" & _
+                                                        "<p>Att," & _
+                                                        "<p>" & Environ("USERNAME") & " - Expedição BMA" & "</p></html>"
+'        .Display
+        .Send
+    End With
+    
+    Set OutlookMail = Nothing
+    Set OutlookApp = Nothing
+    
+    Kill ThisWorkbook.Path & "\Chart1.png"
+    Kill ThisWorkbook.Path & "\Chart2.png"
+    
+    MsgBox "EMAIL ENVIADO COM SUCESSO", vbOKOnly
+    
+End Sub
+                        
 Private Sub OptionButton3_Click()
     ListBox1.Clear
     TextBox6 = ""
