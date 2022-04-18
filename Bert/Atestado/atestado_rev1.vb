@@ -63,6 +63,7 @@ Call SystemButtonSettings(Me, False)
 End Sub
 
 ''''''''''''''''''''''''''''''''''''''''''UserForm1''''''''''''''''''''''''''''''''''''''''''
+
 'Option Explicit
 Dim gConexao As New ADODB.Connection
 Dim lrs As New ADODB.Recordset
@@ -70,10 +71,11 @@ Dim strConexao, sql As String
 Dim ws, wsB, wsC As Worksheet
 Dim wb As Workbook
 
+
 Private Sub lsConectar()
     Set gConexao = New ADODB.Connection
     
-    strConexao = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=H:\Grupos\CZ1 - Transferencia Informacoes\10. Métodos e Processos\BD_Fab_Atestado\Database_FAB_Atestado.accdb;Persist Security Info=False"
+    strConexao = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=H:\Grupos\CZ1 - Transferencia Informacoes\10. Métodos e Processos\BD_Fab_Atestado\Database_Atestado.accdb;Persist Security Info=False"
     gConexao.Open strConexao
     
     If gConexao.State = adStateClosed Then
@@ -95,16 +97,144 @@ Private Sub CommandButton1_Click()
     If MyValue = "1010" Then
         Sheets("BD").Visible = xlSheetVisible
         Sheets("Acesso").Visible = xlSheetVisible
+        Sheets("dash").Visible = xlSheetVisible
     Else
         MsgBox ("Senha Incorreta")
     End If
 End Sub
 
+Private Sub CommandButton9_Click()
+'ATUALIZAR GRAFICO
+    If ComboBox1 = "" Then
+        MsgBox "FAVOR SELECIONAR O MÊS"
+        GoTo FIM
+    End If
+    
+    Dim ch As ChartObject
+    Dim xPTable As PivotTable
+    Dim xPFile As PivotField
+    
+    ThisWorkbook.RefreshAll
+    Set ws = Sheets("dash")
+    On Error Resume Next
+    For Each xPTable In ws.PivotTables
+        Set xPFile1 = xPTable.PivotFields("turno")
+        Set xPFile2 = xPTable.PivotFields("data")
+        
+        xPFile1.ClearAllFilters
+        xPFile1.PivotFilters.Add xlCaptionEquals, Value1:=TextBox3.Value
+        xPFile2.ClearAllFilters
+        xPTable.PivotFields("Meses").ClearAllFilters
+        If xPTable.Name <> "Tabela dinâmica1" Then
+            If ComboBox1 = "Janeiro" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodJanuary
+            ElseIf ComboBox1 = "Fevereiro" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodFebruary
+            ElseIf ComboBox1 = "Março" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodMarch
+            ElseIf ComboBox1 = "Abril" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodApril
+            ElseIf ComboBox1 = "Maio" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodMay
+            ElseIf ComboBox1 = "Junho" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodJune
+            ElseIf ComboBox1 = "Julho" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodJuly
+            ElseIf ComboBox1 = "Agosto" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodAugust
+            ElseIf ComboBox1 = "Setembro" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodSeptember
+            ElseIf ComboBox1 = "Outubro" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodOctober
+            ElseIf ComboBox1 = "Novembro" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodNovember
+            ElseIf ComboBox1 = "Dezembro" Then
+                xPFile2.PivotFilters.Add2 Type:=xlAllDatesInPeriodDecember
+            End If
+        End If
+    Next xPTable
+
+    If ws.Cells(3, 6) = "" Then
+        MsgBox "SEM REGISTROS PARA O MÊS INFORMADO !" & vbCrLf & vbCrLf & "FAVOR SELECIONAR OUTRO MÊS", vbCritical
+        GoTo FIM
+    End If
+    
+    i = 1
+    For Each ch In ws.ChartObjects
+        Set ch = ThisWorkbook.ws.ChartObjects(ch.Name).Chart
+        ch.Chart.Export ThisWorkbook.Path & "\Chart" & i & ".jpeg"
+        i = i + 1
+    Next ch
+    
+    
+    UserForm1.Image2.Picture = LoadPicture(ThisWorkbook.Path & "\Chart1.jpeg")
+    UserForm1.Image3.Picture = LoadPicture(ThisWorkbook.Path & "\Chart2.jpeg")
+    UserForm1.Image4.Picture = LoadPicture(ThisWorkbook.Path & "\Chart3.jpeg")
+    
+    Image2.Visible = True
+    Image3.Visible = True
+    Image4.Visible = True
+    
+    Kill ThisWorkbook.Path & "\Chart1.jpeg"
+    Kill ThisWorkbook.Path & "\Chart2.jpeg"
+    Kill ThisWorkbook.Path & "\Chart3.jpeg"
+    
+'    Image5.Visible = True
+    
+'    ws.Shapes.Item(4).Delete
+'    ws.Range("J4:L" & ws.Cells(4, 10).End(xlDown).Row).Copy
+'    ws.Cells(27, 1).Select
+'    ws.Pictures.Paste.Select
+'
+'    Call ws.Range("J4:L" & ws.Cells(4, 10).End(xlDown).Row).CopyPicture(xlScreen, xlPicture)
+'    ws.Shapes.Item(4).Delete
+'    ws.Shapes.AddChart
+'    Set objChart = ws.ChartObjects(4).Chart
+'    objChart.Paste
+'    objChart.Export (ThisWorkbook.Path & "\Chart" & i & ".png")
+
+
+
+'Dim Imagem As Shape
+'Dim Temp As ChartObject
+'Dim Area As Chart
+'
+''NomeFoto = "Foto1"
+'For Each pic In ws.Pictures
+'    Set Imagem = ws.Shapes.Item("Foto1")
+'    Imagem.Copy
+'
+'Set Temp = Planilha1.ChartObjects.Add(0, 0, Imagem.Width, Imagem.Height)
+'Set Area = Temp.Chart
+'Temp.Activate
+'Dim Pasta As String
+'Pasta = ThisWorkbook.Path
+'With Area
+'.ChartArea.Select
+'.Paste
+'.Export (Pasta & "\" & NomeFoto & ".jpg")
+'End With
+'
+'Temp.Delete
+'
+'FOTO = Pasta & "\" & NomeFoto & ".jpg"
+'
+'Acompanhamento_Diario_BMA.FOTO_OBJETO.Picture = LoadPicture(FOTO)
+
+FIM:
+End Sub
+
 Public Sub UserForm_Initialize()
     Sheets("BD").Visible = xlSheetVeryHidden
     Sheets("Acesso").Visible = xlSheetVeryHidden
+    Sheets("dash").Visible = xlSheetVeryHidden
     Unload UserForm2
     TextBox3 = Sheets("Acesso").Cells(Sheets("Acesso").AutoFilter.Range.Offset(1).SpecialCells(xlCellTypeVisible).Row, 2)
+    ComboBox1.List = Array("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro")
+    Image2.Visible = False
+    Image3.Visible = False
+    Image4.Visible = False
+    Image5.Visible = False
 End Sub
 
 Private Sub CommandButton2_Click()
