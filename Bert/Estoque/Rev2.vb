@@ -84,6 +84,10 @@ Private Sub CommandButton1_Click()
     
     lsConectar
     Set lrs = New ADODB.Recordset
+
+'''''''SELEÇÃO DO BANCO DE DADOS FILTRADO'''''''
+'    If TextBox3 <> "" Then lrs.Open " SELECT * FROM BD_dados WHERE pedido = '" & TextBox3 & "'", gConexao, adOpenKeyset, adLockPessimistic
+
     lrs.Open " SELECT * FROM BD_dados ", gConexao, adOpenKeyset, adLockPessimistic
     ws.Cells(2, 1).CopyFromRecordset lrs
     ws.Columns("A:A").NumberFormat = "0"
