@@ -230,11 +230,11 @@ Private Sub CommandButton5_Click()
     
     Set ws = Sheets("Base de dados")
     
-    ID = ListBox1.List(ListBox1.ListIndex, 0)
-    If ID = 0 Or Not IsNumeric(ID) Then
-        MsgBox "VALOR INCORRETO !" & vbCrLf & vbCrLf & "SELECIONE UM ITEM VÁLIDO PARA DELETAR", vbCritical
+    If ListBox1.ListIndex = -1 Or ListBox1.ListIndex = 0 Or Not IsNumeric(ListBox1.ListIndex) Then
+        MsgBox "VALOR INCORRETO !" & vbCrLf & vbCrLf & "SELECIONE UM ITEM VÁLIDO PARA EDITAR", vbCritical
         GoTo FIM
     End If
+    ID = ListBox1.List(ListBox1.ListIndex, 0)
     
     result = MsgBox("TEM CERTEZA QUE DESEJA EXCLUIR UM REGISTRO?", vbYesNo + vbCritical)
     If result = vbYes Then
@@ -312,11 +312,11 @@ Private Sub CommandButton4_Click()
     
     Set ws = Sheets("Base de dados")
     
-    ID = ListBox1.List(ListBox1.ListIndex, 0)
-    If ID = 0 Or Not IsNumeric(ID) Then
+    If ListBox1.ListIndex = -1 Or ListBox1.ListIndex = 0 Or Not IsNumeric(ListBox1.ListIndex) Then
         MsgBox "VALOR INCORRETO !" & vbCrLf & vbCrLf & "SELECIONE UM ITEM VÁLIDO PARA EDITAR", vbCritical
         GoTo FIM
     End If
+    ID = ListBox1.List(ListBox1.ListIndex, 0)
     
     Application.ScreenUpdating = False
     
