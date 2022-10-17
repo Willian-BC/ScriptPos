@@ -5,6 +5,7 @@ https://excelmacromastery.com/vba-listbox/
 https://fabiobaldini.com.br/excel-vba-com-sharepoint/
 
 https://www.w3schools.com/asp/met_rs_open.asp
+
     adOpenDynamic / adOpenStatic / adLockPessimistic
 
 --------------------------PowerBi---------------------------
