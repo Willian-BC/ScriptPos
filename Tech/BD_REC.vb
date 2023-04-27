@@ -1,3 +1,15 @@
+---------------------------------------------------MÓDULO1----------------------------------------------------
+Sub inserir()
+Load UserForm1
+With UserForm1
+    .Top = Application.Top + 40
+    .Left = Application.Left + 950
+    .Height = 225
+    .Width = 305
+End With
+UserForm1.Show
+End Sub
+----------------------------------------------------------------------------------------------------------------
 Public Sub UserForm_Initialize()
     TextBox4 = Format(CDate(Now()), "dd/mm/yyyy")
 End Sub
