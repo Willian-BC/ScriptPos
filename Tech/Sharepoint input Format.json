@@ -1,0 +1,128 @@
+Header
+-----------------------------------------------------------------------------------------------
+{
+    "elmType": "div",
+    "attributes": {
+        "class": "ms-borderColor-neutralTertiary"
+    },
+    "style": {
+        "width": "100%",
+        "margin-bottom": "15px",
+        "background-color": "#512d6d"
+    },
+    "children": [
+        {
+            "elmType": "div",
+            "style": {
+                "display": "flex",
+                "align-items": "center"
+            },
+            "children": [
+                {
+                    "elmType": "div",
+                    "attributes": {
+                        "iconName": "pageadd",
+                        "class": "ms-fontSize-42 ms-fontWeight-regular ms-fontColor-themePrimary",
+                        "title": "Details"
+                    },
+                    "style": {
+                        "flex": "none",
+                        "padding": "0px",
+                        "padding-left": "10px",
+                        "height": "40px",
+                        "color": "white"
+                    }
+                }
+            ]
+        },
+        {
+            "elmType": "div",
+            "attributes": {
+                "class": "ms-fontColor-themePrimary ms-borderColor-themePrimary ms-fontWeight-bold ms-fontSize-xl ms-fontColor-neutralSecondary–hover ms-bgColor-themeLight–hover"
+            },
+            "style": {
+                "box-sizing": "border-box",
+                "width": "100%",
+                "text-align": "left",
+                "padding": "21px 12px",
+                "overflow": "hidden",
+                "color": "white"
+            },
+            "children": [
+                {
+                    "elmType": "div",
+                    "txtContent": "Novo Registro"
+                }
+            ]
+        }
+    ]
+}
+
+Body
+-----------------------------------------------------------------------------------------------
+{
+    "sections": [
+        {
+            "displayname": "Info. Teste",
+            "fields": [
+                "Tramo",
+                "Terminação",
+                "Usuário",
+                "Operador"
+            ]
+        },
+        {
+            "fields": [
+                "Máquina 1"
+            ]
+        },
+        {
+            "displayname": "Máquina Principal - Entrada",
+            "fields": [
+                "Máq1_E1",
+                "Máq1_E2",
+                "Máq1_E3",
+                "Máq1_E4",
+                "Máq1_E5"
+            ]
+        }
+    ]
+}
+
+Footer
+-----------------------------------------------------------------------------------------------
+{
+    "elmType": "div",
+    "style": {
+        "height": "24px",
+        "width": "100%",
+        "color": "#fff",
+        "font-size": "15px",
+        "border-top": "5px solid #eee",
+        "background-color": "#512d6d",
+        "padding": "10px"
+    },
+    "children": [
+        {
+            "elmType": "div",
+            "style": {
+                "width": "100%",
+                "padding-top": "10px",
+                "height": "24px"
+            },
+            "children": [
+                {
+                    "elmType": "a",
+                    "txtContent": "Painel de acompanhamento PowerBi",
+                    "attributes": {
+                        "target": "_blank",
+                        "href": "https://powerbi.microsoft.com/"
+                    },
+                    "style": {
+                        "color": "white"
+                    }
+                }
+            ]
+        }
+    ]
+}
